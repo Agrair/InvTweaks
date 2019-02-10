@@ -1,0 +1,9 @@
+author = Agrair
+version = 1.0
+displayName = Inventory Tweaks
+buildIgnore = .vs/, .csproj, bin/, obj/, LICENSE, .gitignore, .git
+includePDB = true
+hideCode = false
+hideResources = false
+includeSource = true
+languageVersion = 6
