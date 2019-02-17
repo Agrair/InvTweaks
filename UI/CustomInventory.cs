@@ -26,7 +26,6 @@ namespace InvTweaks.UI
             Append(_vanillaItemSlot);
         }
 
-        // OnDeactivate is called when the UserInterface switches to a different state. In this mod, we switch between no state (null) and this state (ExamplePersonUI).
         // Using OnDeactivate is useful for clearing out Item slots and returning them to the player, as we do here.
         public override void OnDeactivate()
         {
