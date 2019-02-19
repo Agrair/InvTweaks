@@ -3,4 +3,4 @@
 [i:109] Features:
  [i:97] When you consume an item, and the same kind of item is in your inventory, it'll automatically go into your hand after use.
  [i:97] A new inventory slot for your Spectre Hood/Helment, right click it to swap them out.
- [i:97] Shift clicking shop slots will automatically buy as much of that item as you can. (WIP)
+ [i:97] Shift clicking shop slots will automatically buy as much of that item as you can. (Causes minor lag spike occasionally)

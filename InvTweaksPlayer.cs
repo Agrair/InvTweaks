@@ -1,8 +1,270 @@
-﻿namespace InvTweaks
+﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using Terraria;
+using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
+using Terraria.UI;
+
+namespace InvTweaks
 {
-    /*
     public class InvTweaksPlayer : ModPlayer
     {
+        public override bool ShiftClickSlot(Item[] inventory, int context, int slot)
+        {
+            if (!inventory[slot].IsAir)
+            {
+                if (context == ItemSlot.Context.ShopItem)
+                {
+                    var num = Utils.CoinsCount(out var flag, player.bank.item);
+                    var num2 = Utils.CoinsCount(out flag, player.bank2.item);
+                    var num3 = Utils.CoinsCount(out flag, player.bank3.item);
+                    var num4 = Utils.CoinsCount(out flag, player.inventory);
+                    var totalSavings = Utils.CoinsCombineStacks(out flag, num, num2, num3, num4);
+                    var canPayStack = (int)Math.Floor(totalSavings / (double)inventory[slot].GetStoreValue());
+                    if (canPayStack != 0)
+                    {
+                        if (canPayStack > inventory[slot].maxStack)
+                        {
+                            canPayStack = inventory[slot].maxStack;
+                        }
+                        if (Main.mouseItem.type != 0)
+                        {
+                            if (Main.mouseItem.stack + canPayStack > Main.mouseItem.maxStack)
+                            {
+                                int bought = Main.mouseItem.maxStack - Main.mouseItem.stack;
+                                Purchase(inventory[slot].GetStoreValue() * bought,
+                                    bought);
+                                Main.mouseItem.stack = Main.mouseItem.maxStack;
+                            }
+                            else
+                            {
+                                Main.mouseItem.stack += canPayStack;
+                                Purchase(inventory[slot].GetStoreValue() * canPayStack, canPayStack);
+                            }
+                        }
+                        else
+                        {
+                            Main.mouseItem.SetDefaults(inventory[slot].type);
+                            Main.mouseItem.stack = canPayStack;
+                            Purchase(inventory[slot].GetStoreValue() * canPayStack, canPayStack);
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        #region Absolute RedCode, never ever do this
+        private void Purchase(int value, int stack)
+        {
+            List<Item[]> list = new List<Item[]>();
+            Dictionary<int, List<int>> dictionary = new Dictionary<int, List<int>>();
+            List<Point> list2 = new List<Point>();
+            List<Point> list3 = new List<Point>();
+            List<Point> list4 = new List<Point>();
+            List<Point> list5 = new List<Point>();
+            List<Point> list6 = new List<Point>();
+            list.Add(player.inventory);
+            list.Add(player.bank.item);
+            list.Add(player.bank2.item);
+            list.Add(player.bank3.item);
+            for (int i = 0; i < list.Count; i++)
+            {
+                dictionary[i] = new List<int>();
+            }
+            dictionary[0] = new List<int>
+            {
+                58,
+                57,
+                56,
+                55,
+                54
+            };
+            for (int j = 0; j < list.Count; j++)
+            {
+                for (int k = 0; k < list[j].Length; k++)
+                {
+                    if (!dictionary[j].Contains(k) && list[j][k].type >= 71 && list[j][k].type <= 74)
+                    {
+                        list3.Add(new Point(j, k));
+                    }
+                }
+            }
+            int num6 = 0;
+            for (int num7 = list[num6].Length - 1; num7 >= 0; num7--)
+            {
+                if (!dictionary[num6].Contains(num7) && (list[num6][num7].type == 0 || list[num6][num7].stack == 0))
+                {
+                    list2.Add(new Point(num6, num7));
+                }
+            }
+            num6 = 1;
+            for (int num8 = list[num6].Length - 1; num8 >= 0; num8--)
+            {
+                if (!dictionary[num6].Contains(num8) && (list[num6][num8].type == 0 || list[num6][num8].stack == 0))
+                {
+                    list4.Add(new Point(num6, num8));
+                }
+            }
+            num6 = 2;
+            for (int num9 = list[num6].Length - 1; num9 >= 0; num9--)
+            {
+                if (!dictionary[num6].Contains(num9) && (list[num6][num9].type == 0 || list[num6][num9].stack == 0))
+                {
+                    list5.Add(new Point(num6, num9));
+                }
+            }
+            num6 = 3;
+            for (int num10 = list[num6].Length - 1; num10 >= 0; num10--)
+            {
+                if (!dictionary[num6].Contains(num10) && (list[num6][num10].type == 0 || list[num6][num10].stack == 0))
+                {
+                    list6.Add(new Point(num6, num10));
+                }
+            }
+            PurchaseReal(value, list, list2, list3, list4, list5, list6);
+        }
+
+        private void PurchaseReal(int price, List<Item[]> inv, List<Point> slotCoins, List<Point> slotsEmpty, List<Point> slotEmptyBank, List<Point> slotEmptyBank2, List<Point> slotEmptyBank3)
+        {
+            long num = price;
+            Dictionary<Point, Item> dictionary = new Dictionary<Point, Item>();
+            while (num > 0)
+            {
+                long num2 = 1000000L;
+                for (int i = 0; i < 4; i++)
+                {
+                    if (num >= num2)
+                    {
+                        for (int i1 = 0; i1 < slotCoins.Count; i1++)
+                        {
+                            Point slotCoin = slotCoins[i1];
+                            if (inv[slotCoin.X][slotCoin.Y].type == 74 - i)
+                            {
+                                long num3 = num / num2;
+                                dictionary[slotCoin] = inv[slotCoin.X][slotCoin.Y].Clone();
+                                if (num3 < inv[slotCoin.X][slotCoin.Y].stack)
+                                {
+                                    inv[slotCoin.X][slotCoin.Y].stack -= (int)num3;
+                                }
+                                else
+                                {
+                                    inv[slotCoin.X][slotCoin.Y].SetDefaults();
+                                    slotsEmpty.Add(slotCoin);
+                                }
+                                num -= num2 * (dictionary[slotCoin].stack - inv[slotCoin.X][slotCoin.Y].stack);
+                            }
+                        }
+                    }
+                    num2 /= 100;
+                }
+                if (num > 0)
+                {
+                    if (slotsEmpty.Count <= 0)
+                    {
+                        foreach (KeyValuePair<Point, Item> item in dictionary)
+                        {
+                            inv[item.Key.X][item.Key.Y] = item.Value.Clone();
+                        }
+                        break;
+                    }
+                    slotsEmpty.Sort(DelegateMethods.CompareYReverse);
+                    Point point = new Point(-1, -1);
+                    for (int j = 0; j < inv.Count; j++)
+                    {
+                        num2 = 10000L;
+                        for (int k = 0; k < 3; k++)
+                        {
+                            if (num >= num2)
+                            {
+                                foreach (Point slotCoin2 in slotCoins)
+                                {
+                                    if (slotCoin2.X == j && inv[slotCoin2.X][slotCoin2.Y].type == 74 - k && inv[slotCoin2.X][slotCoin2.Y].stack >= 1)
+                                    {
+                                        List<Point> list = slotsEmpty;
+                                        if (j == 1 && slotEmptyBank.Count > 0)
+                                        {
+                                            list = slotEmptyBank;
+                                        }
+                                        if (j == 2 && slotEmptyBank2.Count > 0)
+                                        {
+                                            list = slotEmptyBank2;
+                                        }
+                                        if (--inv[slotCoin2.X][slotCoin2.Y].stack <= 0)
+                                        {
+                                            inv[slotCoin2.X][slotCoin2.Y].SetDefaults();
+                                            list.Add(slotCoin2);
+                                        }
+                                        dictionary[list[0]] = inv[list[0].X][list[0].Y].Clone();
+                                        inv[list[0].X][list[0].Y].SetDefaults(73 - k);
+                                        inv[list[0].X][list[0].Y].stack = 100;
+                                        point = list[0];
+                                        list.RemoveAt(0);
+                                        break;
+                                    }
+                                }
+                            }
+                            if (point.X != -1 || point.Y != -1)
+                            {
+                                break;
+                            }
+                            num2 /= 100;
+                        }
+                        for (int l = 0; l < 2; l++)
+                        {
+                            if (point.X == -1 && point.Y == -1)
+                            {
+                                for (int i = 0; i < slotCoins.Count; i++)
+                                {
+                                    Point slotCoin3 = slotCoins[i];
+                                    if (slotCoin3.X == j && inv[slotCoin3.X][slotCoin3.Y].type == 73 + l && inv[slotCoin3.X][slotCoin3.Y].stack >= 1)
+                                    {
+                                        List<Point> list2 = slotsEmpty;
+                                        if (j == 1 && slotEmptyBank.Count > 0)
+                                        {
+                                            list2 = slotEmptyBank;
+                                        }
+                                        if (j == 2 && slotEmptyBank2.Count > 0)
+                                        {
+                                            list2 = slotEmptyBank2;
+                                        }
+                                        if (j == 3 && slotEmptyBank3.Count > 0)
+                                        {
+                                            list2 = slotEmptyBank3;
+                                        }
+                                        if (--inv[slotCoin3.X][slotCoin3.Y].stack <= 0)
+                                        {
+                                            inv[slotCoin3.X][slotCoin3.Y].SetDefaults();
+                                            list2.Add(slotCoin3);
+                                        }
+                                        dictionary[list2[0]] = inv[list2[0].X][list2[0].Y].Clone();
+                                        inv[list2[0].X][list2[0].Y].SetDefaults(72 + l);
+                                        inv[list2[0].X][list2[0].Y].stack = 100;
+                                        point = list2[0];
+                                        list2.RemoveAt(0);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (point.X != -1 && point.Y != -1)
+                        {
+                            slotCoins.Add(point);
+                            break;
+                        }
+                    }
+                    slotsEmpty.Sort(DelegateMethods.CompareYReverse);
+                    slotEmptyBank.Sort(DelegateMethods.CompareYReverse);
+                    slotEmptyBank2.Sort(DelegateMethods.CompareYReverse);
+                    slotEmptyBank3.Sort(DelegateMethods.CompareYReverse);
+                }
+            }
+        }
+        #endregion
+
+        /*
         public override bool ShiftClickSlot(Item[] inventory, int context, int slot)
         {
             **************************
@@ -269,6 +531,6 @@
             }
             return result;
         }
+        */
     }
-    */
 }
