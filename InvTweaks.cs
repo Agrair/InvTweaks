@@ -2,6 +2,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -14,7 +16,7 @@ namespace InvTweaks
 	{
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
-            int index = layers.FindIndex(x => x.Name == "Hotbar");
+            int index = layers.FindIndex(x => x.Name == "Vanilla: Hotbar");
             if (index != -1)
             {
                 layers.Insert(index + 1,
@@ -27,63 +29,36 @@ namespace InvTweaks
                             Main.inventoryScale = .75f;
                             if (Main.playerInventory)
                             {
-                                int num = ((Main.inventoryBackTexture.Width) + 4) * 10;
+                                Main.inventoryScale = .85f;
+                                int num = 20 + ((int)(Main.inventoryBackTexture.Width * Main.inventoryScale) + 4) * 10;
+                                if (Main.mouseX > num
+                                    && Main.mouseX < num + Main.inventoryBackTexture.Width * Main.inventoryScale
+                                    && Main.mouseY > 20
+                                    && Main.mouseY < 20 + Main.inventoryBackTexture.Width * Main.inventoryScale
+                                    && ValidItem(Main.mouseItem))
+                                {
+                                    ItemSlot.Handle(ref LMPlayer().extraSlotItem, 0);
+                                }
                                 ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
                                     ItemSlot.Context.EquipAccessory, new Vector2(num, 20));
-                                if (Main.mouseX > num
-                                    && Main.mouseX < num + Main.inventoryBackTexture.Width
-                                    && Main.mouseY > 20
-                                    && Main.mouseY < 20 + Main.inventoryBackTexture.Width
-                                    && Main.mouseItem.accessory)
-                                {
-                                    ItemSlot.Handle(ref LMPlayer().extraSlotItem, 10);
-
-                                    if (Main.mouseRight && Main.mouseRightRelease)
-                                    {
-                                        ItemSlot.SwapEquip(ref LMPlayer().extraSlotItem, 10);
-                                    }
-                                }
                             }
-                            else if (Main.player[Main.myPlayer].selectedItem >= 10
-                                && Main.player[Main.myPlayer].dead)
-                            {
-                                int num = (int)(((Main.inventoryBackTexture.Width * .75f) + 4) * 9);
-                                num += Main.inventoryBackTexture.Width + 4;
-                                ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
-                                    ItemSlot.Context.EquipAccessory, new Vector2(num, 20));
-                                if (Main.mouseX > num
-                                    && Main.mouseX < num + (int)(Main.inventoryBackTexture.Width * .85f)
-                                    && Main.mouseY > 20
-                                    && Main.mouseY < 20 + (int)(Main.inventoryBackTexture.Width * .85f)
-                                    && Main.mouseItem.accessory)
-                                {
-                                    ItemSlot.Handle(ref LMPlayer().extraSlotItem, 10);
-
-                                    if (Main.mouseRight && Main.mouseRightRelease)
-                                    {
-                                        ItemSlot.SwapEquip(ref LMPlayer().extraSlotItem, 10);
-                                    }
-                                }
-                            }
-                            // else if (!Main.playerInventory)
                             else
                             {
-                                int num = ((Main.inventoryBackTexture.Width) + 4) * 10;
-                                ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
-                                    ItemSlot.Context.EquipAccessory, new Vector2(num, 20));
-                                if (Main.mouseX > num
-                                    && Main.mouseX < num + (int)(Main.inventoryBackTexture.Width * .85f)
-                                    && Main.mouseY > 20
-                                    && Main.mouseY < 20 + (int)(Main.inventoryBackTexture.Width * .85f)
-                                    && Main.mouseItem.accessory)
+                                int num = 20;
+                                for (int i = 0; i < Main.hotbarScale.Length; i++)
                                 {
-                                    ItemSlot.Handle(ref LMPlayer().extraSlotItem, 10);
-
-                                    if (Main.mouseRight && Main.mouseRightRelease)
-                                    {
-                                        ItemSlot.SwapEquip(ref LMPlayer().extraSlotItem, 10);
-                                    }
+                                    num += (int)(Main.inventoryBackTexture.Width * Main.hotbarScale[i]) + 4;
                                 }
+                                if (Main.mouseX > num
+                                    && Main.mouseX < num + (int)(Main.inventoryBackTexture.Width * .75f)
+                                    && Main.mouseY > 20
+                                    && Main.mouseY < 20 + (int)(Main.inventoryBackTexture.Width * .75f)
+                                    && ValidItem(Main.mouseItem))
+                                {
+                                    ItemSlot.Handle(ref LMPlayer().extraSlotItem, 0);
+                                }
+                                ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
+                                    ItemSlot.Context.EquipAccessory, new Vector2(num, 25));
                             }
                             Main.inventoryScale = oldScale;
                         }
@@ -98,27 +73,13 @@ namespace InvTweaks
             return Main.player[Main.myPlayer].GetModPlayer(this, "InvTweaksPlayer") as InvTweaksPlayer;
         }
 
-        private void DrawExtraSlot(SpriteBatch batch, int i, int j, Color drawColor)
+        private bool ValidItem(Item item)
         {
-            Item drawItem = Main.player[Main.myPlayer].GetModPlayer<InvTweaksPlayer>().extraSlotItem;
-            if (Main.mouseX > i && 
-                Main.mouseX < i + (int)(Main.inventoryBackTexture.Width * Main.inventoryScale) &&
-                Main.mouseY > j &&
-                Main.mouseY < j + (int)(Main.inventoryBackTexture.Height * Main.inventoryScale)
-                && Main.mouseItem.accessory)
-            {
-                ItemSlot.Handle(ref drawItem, 10);
-
-                if (Main.mouseRight && Main.mouseRightRelease)
-                {
-                    ItemSlot.SwapEquip(ref drawItem, 10);
-                }
-            }
-            // float oldScale = Main.inventoryScale;
-            // Main.inventoryScale = 1;
-            ItemSlot.Draw(batch, ref drawItem, 
-                ItemSlot.Context.EquipAccessory, new Vector2(i, j), drawColor);
-            // Main.inventoryScale = oldScale;
+            return item.IsAir || (!item.IsAir && (item.vanity 
+                                || item.accessory 
+                                || item.headSlot > -1
+                                || item.bodySlot > -1 
+                                || item.legSlot > -1));
         }
     }
 }
