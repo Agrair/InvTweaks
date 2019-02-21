@@ -1,8 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Mono.Cecil.Cil;
-using MonoMod.RuntimeDetour.HookGen;
-using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -14,50 +12,90 @@ namespace InvTweaks
      */
     public class InvTweaks : Mod
 	{
-        public override void Load()
+        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
-            // if (!Main.dedServ) // Despite the fact that its UI, it's beter to have IL edits on all clients
+            int index = layers.FindIndex(x => x.Name == "Hotbar");
+            if (index != -1)
             {
-                // A little unnecessary, but
-                IL.Terraria.Main.GUIHotbarDrawInner += il =>
-                {
-                    var c = il.At(0);
-
-                    int loopIndex = 0;
-                    int x = 0;
-                    int y = 0;
-
-                    if (c.TryGotoNext(i => i.MatchCall<ItemSlot>("Draw"),
-                        // Main.spriteBatch
-                        i => i.MatchLdfld<Main>("spriteBatch"),
-                        // Main.player[Main.myPlayer].Inventory
-                        i => i.MatchLdsfld<Main>("player"),
-                        i => i.MatchLdsfld<Main>("myPlayer"),
-                        i => i.MatchLdelemRef(),
-                        i => i.MatchLdfld<Player>("inventory"),
-                        // 13
-                        i => i.MatchLdcI4(13),
-                        // i
-                        i => i.MatchLdloc(out loopIndex),
-                        //Load (float)num
-                        i => i.MatchLdloc(out x),
-                        i => i.MatchConvR4(),
-                        //Load (float)num3
-                        i => i.MatchLdloc(out y),
-                        i => i.MatchConvR4(),
-                        // new Vector2((float)num, (float)num3)
-                        i => i.MatchNewobj<Vector2>()))
+                layers.Insert(index + 1,
+                    new LegacyGameInterfaceLayer("Inventory Tweaks : Hotbar", 
+                    delegate
                     {
-                        if (Main.player[Main.myPlayer].selectedItem < 10
-                            && !Main.player[Main.myPlayer].dead
-                             && loopIndex == 9)
+                        if (!Main.gameMenu)
                         {
-                            c.Emit(OpCodes.Ldstr, "Hey guys, IL editing here, back with another Terraria mod.");
-                            c.Emit(OpCodes.Call, typeof(Main).GetMethod("NewText", new Type[] { typeof(string) }));
+                            float oldScale = Main.inventoryScale;
+                            Main.inventoryScale = .75f;
+                            if (Main.playerInventory)
+                            {
+                                int num = ((Main.inventoryBackTexture.Width) + 4) * 10;
+                                ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
+                                    ItemSlot.Context.EquipAccessory, new Vector2(num, 20));
+                                if (Main.mouseX > num
+                                    && Main.mouseX < num + Main.inventoryBackTexture.Width
+                                    && Main.mouseY > 20
+                                    && Main.mouseY < 20 + Main.inventoryBackTexture.Width
+                                    && Main.mouseItem.accessory)
+                                {
+                                    ItemSlot.Handle(ref LMPlayer().extraSlotItem, 10);
+
+                                    if (Main.mouseRight && Main.mouseRightRelease)
+                                    {
+                                        ItemSlot.SwapEquip(ref LMPlayer().extraSlotItem, 10);
+                                    }
+                                }
+                            }
+                            else if (Main.player[Main.myPlayer].selectedItem >= 10
+                                && Main.player[Main.myPlayer].dead)
+                            {
+                                int num = (int)(((Main.inventoryBackTexture.Width * .75f) + 4) * 9);
+                                num += Main.inventoryBackTexture.Width + 4;
+                                ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
+                                    ItemSlot.Context.EquipAccessory, new Vector2(num, 20));
+                                if (Main.mouseX > num
+                                    && Main.mouseX < num + (int)(Main.inventoryBackTexture.Width * .85f)
+                                    && Main.mouseY > 20
+                                    && Main.mouseY < 20 + (int)(Main.inventoryBackTexture.Width * .85f)
+                                    && Main.mouseItem.accessory)
+                                {
+                                    ItemSlot.Handle(ref LMPlayer().extraSlotItem, 10);
+
+                                    if (Main.mouseRight && Main.mouseRightRelease)
+                                    {
+                                        ItemSlot.SwapEquip(ref LMPlayer().extraSlotItem, 10);
+                                    }
+                                }
+                            }
+                            // else if (!Main.playerInventory)
+                            else
+                            {
+                                int num = ((Main.inventoryBackTexture.Width) + 4) * 10;
+                                ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
+                                    ItemSlot.Context.EquipAccessory, new Vector2(num, 20));
+                                if (Main.mouseX > num
+                                    && Main.mouseX < num + (int)(Main.inventoryBackTexture.Width * .85f)
+                                    && Main.mouseY > 20
+                                    && Main.mouseY < 20 + (int)(Main.inventoryBackTexture.Width * .85f)
+                                    && Main.mouseItem.accessory)
+                                {
+                                    ItemSlot.Handle(ref LMPlayer().extraSlotItem, 10);
+
+                                    if (Main.mouseRight && Main.mouseRightRelease)
+                                    {
+                                        ItemSlot.SwapEquip(ref LMPlayer().extraSlotItem, 10);
+                                    }
+                                }
+                            }
+                            Main.inventoryScale = oldScale;
                         }
-                    }
-                };
+                        return true;
+                    },
+                    InterfaceScaleType.UI));
             }
+        }
+
+        private InvTweaksPlayer LMPlayer()
+        {
+            return Main.player[Main.myPlayer].GetModPlayer(this, "InvTweaksPlayer") as InvTweaksPlayer;
         }
 
         private void DrawExtraSlot(SpriteBatch batch, int i, int j, Color drawColor)
