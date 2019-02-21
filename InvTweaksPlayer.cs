@@ -10,13 +10,36 @@ namespace InvTweaks
 {
     public class InvTweaksPlayer : ModPlayer
     {
+        public Item extraSlotItem;
+
+        public override void Initialize()
+        {
+            extraSlotItem = new Item();
+            extraSlotItem.SetDefaults();
+            extraSlotItem.TurnToAir();
+        }
+
+        public override void Load(TagCompound tag)
+        {
+            extraSlotItem.SetDefaults(tag.GetInt("extraSlotItem_Type"));
+        }
+
+        public override TagCompound Save()
+        {
+            return new TagCompound
+            {
+                ["extraSlotItem_Type"] = extraSlotItem.type
+            };
+        }
+
         public override bool ShiftClickSlot(Item[] inventory, int context, int slot)
         {
             if (!inventory[slot].IsAir)
             {
                 if (context == ItemSlot.Context.ShopItem)
                 {
-                    var num = Utils.CoinsCount(out var flag, player.bank.item);
+                    bool flag;
+                    var num = Utils.CoinsCount(out flag, player.bank.item);
                     var num2 = Utils.CoinsCount(out flag, player.bank2.item);
                     var num3 = Utils.CoinsCount(out flag, player.bank3.item);
                     var num4 = Utils.CoinsCount(out flag, player.inventory);

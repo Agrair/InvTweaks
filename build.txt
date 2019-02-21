@@ -1,5 +1,5 @@
 author = Agrair
-version = 2.0
+version = 1.9.9.9
 displayName = Inventory Tweaks
 buildIgnore = .vs/, .csproj, bin/, obj/, LICENSE, .gitignore, .git, .sln, .user
 includePDB = true
@@ -8,3 +8,4 @@ hideResources = false
 includeSource = true
 languageVersion = 6
 homepage = https://github.com/Agrair/InvTweaks
+modReferences = TerrariaHooks
