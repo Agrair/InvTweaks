@@ -29,15 +29,15 @@ namespace InvTweaks
             };
         }
 
-        // TODO: MAKE THIS SHIT WORK
+        #region TODO: MAKE THIS SHIT WORK
+        /*
         public override bool ShiftClickSlot(Item[] inventory, int context, int slot)
         {
             if (!inventory[slot].IsAir)
             {
                 if (context == ItemSlot.Context.ShopItem)
                 {
-                    bool flag;
-                    var num = Utils.CoinsCount(out flag, player.bank.item);
+                    var num = Utils.CoinsCount(out bool flag, player.bank.item);
                     var num2 = Utils.CoinsCount(out flag, player.bank2.item);
                     var num3 = Utils.CoinsCount(out flag, player.bank3.item);
                     var num4 = Utils.CoinsCount(out flag, player.inventory);
@@ -75,5 +75,7 @@ namespace InvTweaks
             }
             return false;
         }
+        */
+        #endregion
     }
 }

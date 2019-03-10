@@ -2,11 +2,10 @@
 
 [i:109] Features:
  [i:97] When you consume an item, and the same kind of item is in your inventory, it'll automatically go into your hand after use.
- [i:97] A new inventory slot for your Spectre Hood/Helment, right click it to swap them out.
- [i:97] Shift clicking shop slots will automatically buy as much of that item as you can. (WIP)
+ [i:97] A new hotbar slot for your Spectre Hood/Helment, right click it to swap them out.
+ [i:97] Shift clicking shop slots will automatically buy as much of that item as you can. (Unimplemented)
 
-[i:75] Changelog for 1.2
- [i:97] Removed shift clicking until it's fixed
- [i:97] Fixed yet another bug with the extra accessory slot
+[i:75] Changelog for 2.2.0.1
+ [i:97] Extra hotbar slot is faster by a couple milliseconds, cleaned up the code.
 
 Report any issues through GitHub (homepage) or on Discord (Agrair#7746)
