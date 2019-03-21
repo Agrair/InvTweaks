@@ -1,5 +1,5 @@
-author = Inkeyeus
-version = 2.2.0.2
+author = Agrair
+version = 2.2.0.3
 displayName = Inventory Tweaks
 buildIgnore = .vs/, .csproj, bin/, obj/, LICENSE, .gitignore, .git, .sln, .user
 includePDB = true
