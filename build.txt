@@ -1,5 +1,5 @@
 author = Agrair
-version = 2.2.0.3
+version = 2.2.0.4
 displayName = Inventory Tweaks
 buildIgnore = .vs/, .csproj, bin/, obj/, LICENSE, .gitignore, .git, .sln, .user
 includePDB = true
@@ -7,4 +7,4 @@ hideCode = false
 hideResources = false
 includeSource = true
 languageVersion = 6
-homepage = https://forums.terraria.org/index.php?threads/inkeyeus-motley-collection-of-mods.78250/
+homepage = https://forums.terraria.org/index.php?threads/inventory-tweaks-for-terraria.79186/
