@@ -29,11 +29,11 @@ namespace InvTweaks
                 if (Main.playerInventory)
                 {
                     Main.inventoryScale = .85f;
-                    int num = 20 + ((int)(Main.inventoryBackTexture.Width * Main.inventoryScale) + 4) * 10;
+                    int num = 20 + ((int)(Main.inventoryBackTexture.Width * .85f) + 4) * 10;
                     if (Main.mouseX > num
-                        && Main.mouseX < num + Main.inventoryBackTexture.Width * Main.inventoryScale
+                        && Main.mouseX < num + Main.inventoryBackTexture.Width * .85f
                         && Main.mouseY > 20
-                        && Main.mouseY < 20 + Main.inventoryBackTexture.Width * Main.inventoryScale
+                        && Main.mouseY < 20 + Main.inventoryBackTexture.Width * .85f
                         && IsAccessory(Main.mouseItem))
                     {
                         Main.instance.MouseText(LMPlayer().extraSlotItem.HoverName, LMPlayer().extraSlotItem.rare);
