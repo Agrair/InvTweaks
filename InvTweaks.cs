@@ -58,6 +58,10 @@ namespace InvTweaks
                     {
                         num += (int)(Main.inventoryBackTexture.Width * Main.hotbarScale[i]) + 4;
                     }
+                    if (Main.LocalPlayer.selectedItem >= Main.hotbarScale.Length)
+                    {
+                        num += Main.inventoryBackTexture.Width + 4;
+                    }
                     if (Main.mouseX > num
                         && Main.mouseX < num + (int)(Main.inventoryBackTexture.Width * .75f)
                         && Main.mouseY > 20
