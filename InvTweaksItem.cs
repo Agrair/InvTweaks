@@ -1,5 +1,4 @@
-﻿using Terraria.ID;
-using Terraria;
+﻿using Terraria;
 using Terraria.ModLoader;
 
 namespace InvTweaks
@@ -12,11 +11,11 @@ namespace InvTweaks
             {
                 for (int i = 0; i < player.inventory.Length; i++)
                 {
-                    Item curItem = player.inventory[i];
-                    if (curItem.type == item.type && i != player.selectedItem)
+                    Item queryItem = player.inventory[i];
+                    if (queryItem.type == item.type && i != player.selectedItem && !queryItem.favorited)
                     {
-                        item.stack = curItem.stack;
-                        curItem.TurnToAir();
+                        item.stack = queryItem.stack;
+                        queryItem.TurnToAir();
                         return false;
                     }
                 }
