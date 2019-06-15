@@ -7,21 +7,26 @@ using Terraria.UI;
 namespace InvTweaks
 {
     public class InvTweaks : Mod
-	{
+    {
+        public override void Load()
+        {
+            Config.Load();
+        }
+
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int index = layers.FindIndex(x => x.Name == "Vanilla: Hotbar");
             if (index != -1)
             {
                 layers.Insert(index + 1,
-                    new LegacyGameInterfaceLayer("Inventory Tweaks : Hotbar", DrawExtraHotbarSlot,
+                    new LegacyGameInterfaceLayer("InvTweaks: Hotbar", DrawExtraHotbarSlot,
                     InterfaceScaleType.UI));
             }
         }
 
         private bool DrawExtraHotbarSlot()
         {
-            if (!Main.gameMenu)
+            if (!Main.gameMenu && Config.helmetSlot)
             {
                 float oldScale = Main.inventoryScale;
                 Main.inventoryScale = .75f;
