@@ -149,5 +149,8 @@ namespace InvTweaks
                                 || item.bodySlot > -1 
                                 || item.legSlot > -1));
         }
+        
+        public static string GithubUserName { get { return "Agrair"; } }
+        public static string GithubProjectName { get { return "InvTweaks"; } }
     }
 }
