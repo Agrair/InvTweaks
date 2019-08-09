@@ -1,9 +1,9 @@
-﻿using System;
+﻿using System.Linq;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using Terraria.UI;
 
 namespace InvTweaks
 {
@@ -30,6 +30,27 @@ namespace InvTweaks
             }
         }
 
+        private int originalSelectedItem;
+        private bool autoRevertSelectedItem;
+
+        public void PlaceTree(Point16 mouse)
+        {
+            for (int i = 0; i < player.inventory.Length; i++)
+            {
+                Item item = player.inventory[i];
+                if (item.type == ItemID.Acorn)
+                {
+                    //Main.NewText("index: " + i);
+                    originalSelectedItem = player.selectedItem;
+                    autoRevertSelectedItem = true;
+                    player.selectedItem = i;
+                    player.controlUseItem = true;
+                    player.ItemCheck(Main.myPlayer);
+                    return;
+                }
+            }
+        }
+
         public override TagCompound Save()
         {
             return new TagCompound
@@ -37,122 +58,135 @@ namespace InvTweaks
                 ["extraSlotItem"] = ItemIO.Save(extraSlotItem)
             };
         }
-        
-        /*
 
-        public override bool ShiftClickSlot(Item[] inventory, int context, int slot)
+        public override void PostUpdateBuffs()
         {
-            if (!inventory[slot].IsAir)
+            if (InvTweaks.clientConfig.AutoBuff)
             {
-                if (context == ItemSlot.Context.ShopItem)
+                for (int queryBuff = 0; queryBuff < player.buffTime.Length; queryBuff++)
                 {
-                    var num = Utils.CoinsCount(out _, player.bank.item);
-                    var num2 = Utils.CoinsCount(out _, player.bank2.item);
-                    var num3 = Utils.CoinsCount(out _, player.bank3.item);
-                    var num4 = Utils.CoinsCount(out _, player.inventory, new int[]
+                    if (player.buffTime[queryBuff] == 1)
                     {
-                        58,
-                        57,
-                        56,
-                        55,
-                        54
-                    });
-                    var change = Utils.CoinsCombineStacks(out _, num, num2, num3, num4);
-                    if (change < inventory[slot].GetStoreValue()) return false;
-                    if ((Main.mouseItem.type == inventory[slot].type || Main.mouseItem.type == 0)
-                        && Main.mouseItem.stack < Main.mouseItem.maxStack)
-                    {
-                        do
+                        for (int queryItem = 0; queryItem < player.inventory.Length - 5; queryItem++)
                         {
-                            if (Main.mouseItem.type == 0)
+                            if (player.inventory[queryItem].buffType == player.buffType[queryBuff])
                             {
-                                Main.mouseItem.SetDefaults(inventory[slot].type);
-                                Main.mouseItem.stack = 0;
+                                ItemLoader.UseItem(player.inventory[queryItem], player);
+                                player.buffTime[queryBuff] = player.inventory[queryItem].buffTime;
+                                //the swapping of cursorFill is unconventional,
+                                //but prevents items from randomly teleporting thru the inv
+                                bool cursorFill = InvTweaks.clientConfig.CursorFill;
+                                InvTweaks.clientConfig.CursorFill = false;
+                                if (ItemLoader.ConsumeItem(player.inventory[queryItem], player))
+                                {
+                                    if (--player.inventory[queryItem].stack <= 0)
+                                        player.inventory[queryItem].TurnToAir();
+                                }
+                                InvTweaks.clientConfig.CursorFill = cursorFill;
+                                Recipe.FindRecipes();
                             }
-                            Main.mouseItem.stack++;
-                            purchase();
-                            change -= inventory[slot].GetStoreValue();
-                        }
-                        while (Main.mouseItem.stack < Main.mouseItem.maxStack
-                            && change >= inventory[slot].GetStoreValue());
-                        return true;
-                    }
-                }
-            }
-            return false;
-
-            void purchase()
-            {
-                int remainingCost = inventory[slot].GetStoreValue();
-                for (int i = 0; i < player.bank.item.Length; i++)
-                {
-                    if (consumeCoin(player.bank.item[i])) return;
-                }
-                for (int i = 0; i < player.bank2.item.Length; i++)
-                {
-                    if (consumeCoin(player.bank2.item[i])) return;
-                }
-                for (int i = 0; i < player.bank3.item.Length; i++)
-                {
-                    if (consumeCoin(player.bank3.item[i])) return;
-                }
-                for (int i = 0; i < player.inventory.Length; i++)
-                {
-                    if (consumeCoin(player.inventory[i])) return;
-                }
-
-                bool consumeCoin(Item item)
-                {
-                    if (item.type == ItemID.PlatinumCoin)
-                    {
-                        var consumeCount = Utils.Clamp((int)Math.Floor(remainingCost / 100000000.0), 0, item.stack);
-                        remainingCost -= 100000000 * consumeCount;
-                        if ((item.stack -= consumeCount) == 0) item.TurnToAir();
-                        if (remainingCost == 0) return true;
-                        if (remainingCost < 0)
-                        {
-                            remainingCost = Math.Abs(remainingCost);
-                            // if `remainingCost` was negative, that means it was
-                            // less than one platinum
-                            player.QuickSpawnItem(ItemID.GoldCoin, remainingCost);
                         }
                     }
-                    else if (item.type == ItemID.GoldCoin)
-                    {
-                        var consumeCount = Utils.Clamp((int)Math.Floor(remainingCost / 100000000.0), 0, item.stack);
-                        remainingCost -= 100000000 * consumeCount;
-                        if ((item.stack -= consumeCount) == 0) item.TurnToAir();
-                        if (remainingCost == 0) return true;
-                        if (remainingCost < 0)
-                        {
-                            remainingCost = Math.Abs(remainingCost);
-                            player.QuickSpawnItem(ItemID.GoldCoin, remainingCost);
-                        }
-                    }
-                    else if (item.type == ItemID.SilverCoin)
-                    {
-                        var consumeCount = Utils.Clamp((int)Math.Floor(remainingCost / 100000000.0), 0, item.stack);
-                        remainingCost -= 100000000 * consumeCount;
-                        if ((item.stack -= consumeCount) == 0) item.TurnToAir();
-                        if (remainingCost == 0) return true;
-                        if (remainingCost < 0)
-                        {
-                            remainingCost = Math.Abs(remainingCost);
-                            player.QuickSpawnItem(ItemID.CopperCoin, remainingCost);
-                        }
-                    }
-                    else if (item.type == ItemID.CopperCoin)
-                    {
-                        var consumeCount = Utils.Clamp(remainingCost, 0, item.stack);
-                        remainingCost -= consumeCount;
-                        if ((item.stack -= consumeCount) == 0) item.TurnToAir();
-                        if (remainingCost == 0) return true;
-                    }
-                    return false;
                 }
             }
         }
 
-    */
+        public override void PostUpdate()
+        {
+            if (autoRevertSelectedItem)
+            {
+                if (player.itemTime == 0 && player.itemAnimation == 0)
+                {
+                    player.selectedItem = originalSelectedItem;
+                    autoRevertSelectedItem = false;
+                }
+            }
+        }
+
+        public override void PostHurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit)
+        {
+            if (InvTweaks.clientConfig.AutoHeal
+                && player.statLife < player.statLifeMax2 * (InvTweaks.clientConfig.AutoHealThreshold * .01))
+            {
+                if (player.noItems) return;
+                if (player.potionDelay > 0) return;
+                if (!(player.QuickHeal_GetItemToUse() is Item item)) return;
+
+                Main.PlaySound(item.UseSound, player.position);
+
+                if (item.potion)
+                {
+                    if (item.type == 227)
+                    {
+                        player.AddBuff(21, player.potionDelay = player.restorationDelayTime, true);
+                    }
+                    else
+                    {
+                        player.AddBuff(21, player.potionDelay = player.potionDelayTime, true);
+                    }
+                }
+                ItemLoader.UseItem(item, player);
+                int healLife = player.GetHealLife(item, true);
+
+                player.statLife += healLife;
+
+                if (player.statLife > player.statLifeMax2)
+                {
+                    player.statLife = player.statLifeMax2;
+                }
+                if (player.statMana > player.statManaMax2)
+                {
+                    player.statMana = player.statManaMax2;
+                }
+                if (healLife > 0 && Main.myPlayer == player.whoAmI)
+                {
+                    player.HealEffect(healLife, true);
+                }
+                if (ItemLoader.ConsumeItem(item, player))
+                {
+                    if (--item.stack <= 0) item.TurnToAir();
+                }
+                Recipe.FindRecipes();
+            }
+        }
+
+        public override void PostBuyItem(NPC vendor, Item[] shopInventory, Item item)
+        {
+            Item shopItem = shopInventory.FirstOrDefault(x => x.type == item.type);
+            if (InvTweaksUI.visible
+                && !Terraria.UI.ItemSlot.ShiftInUse
+                && PlayerHooks.CanBuyItem(player, Main.npc[player.talkNPC], shopInventory, shopItem)
+                && (Main.mouseItem.stack < Main.mouseItem.maxStack)
+                && (Main.mouseItem.stack < InvTweaks.instance.ui.GetStack())
+                && player.BuyItem(shopItem.GetStoreValue(), shopItem.shopSpecialCurrency))
+            {
+                Main.mouseItem.stack++;
+                if (Main.stackSplit == 0)
+                {
+                    Main.stackSplit = 15;
+                }
+                else
+                {
+                    Main.stackSplit = Main.stackDelay;
+                }
+                if (shopItem.buyOnce && --shopItem.stack <= 0)
+                {
+                    shopItem.SetDefaults(0, false);
+                }
+                PlayerHooks.PostBuyItem(player, Main.npc[player.talkNPC], shopInventory, Main.mouseItem);
+            }
+
+            //Recipe.FindRecipes();
+        }
+
+        public override bool CanBuyItem(NPC vendor, Item[] shopInventory, Item item)
+        {
+            if (Terraria.UI.ItemSlot.ShiftInUse && !InvTweaksUI.visible)
+            {
+                InvTweaksUI.visible = InvTweaks.clientConfig.ShopClick;
+                InvTweaks.instance.ui.SetStack(item.maxStack);
+            }
+            return true;
+        }
     }
 }

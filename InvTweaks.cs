@@ -8,9 +8,34 @@ namespace InvTweaks
 {
     public class InvTweaks : Mod
     {
+        public static InvTweaks instance;
+        public static ClientConfig clientConfig;
+
+        internal InvTweaksUI ui;
+        public UserInterface uiInterface;
+
         public override void Load()
         {
-            Config.Load();
+            instance = this;
+            if (Main.dedServ)
+            {
+                Logger.Warn("DON'T LOAD INVENTORY TWEAKS ON SERVER, MAY OR MAY NOT CAUSE ISSUES");
+            }
+            else
+            {
+                ui = new InvTweaksUI();
+                ui.Activate();
+                uiInterface = new UserInterface();
+                uiInterface.SetState(ui);
+            }
+        }
+
+        public override void UpdateUI(GameTime gameTime)
+        {
+            if (InvTweaksUI.visible)
+            {
+                uiInterface?.Update(gameTime);
+            }
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -18,19 +43,27 @@ namespace InvTweaks
             int index = layers.FindIndex(x => x.Name == "Vanilla: Hotbar");
             if (index != -1)
             {
-                layers.Insert(index + 1,
+                layers.Insert((index == -1) ? layers.Count - 1 : index + 1,
                     new LegacyGameInterfaceLayer("InvTweaks: Hotbar", DrawExtraHotbarSlot,
                     InterfaceScaleType.UI));
             }
+            layers.Add(new LegacyGameInterfaceLayer("InvTweaks: Shop Stack Select", delegate
+            {
+                if (InvTweaksUI.visible)
+                {
+                    if (Main.LocalPlayer.talkNPC == -1) InvTweaksUI.visible = false;
+                    uiInterface?.Draw(Main.spriteBatch, new GameTime());
+                }
+                return true;
+            }, InterfaceScaleType.UI));
         }
 
         private bool DrawExtraHotbarSlot()
         {
-            if (!Main.gameMenu && Config.helmetSlot)
+            if (!Main.gameMenu && clientConfig.HelmetSlot)
             {
                 float oldScale = Main.inventoryScale;
                 Main.inventoryScale = .75f;
-                // FixMouse();
                 if (Main.playerInventory)
                 {
                     Main.inventoryScale = .85f;
@@ -88,46 +121,16 @@ namespace InvTweaks
                     ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
                         ItemSlot.Context.EquipAccessory, new Vector2(num, 25));
                 }
-                // FixMouse(false);
                 Main.inventoryScale = oldScale;
             }
             return true;
         }
 
-        #region Code given by direwolf, doesn't work in this situation anymore though
-        /*
-        int lastMouseXbak;
-        int lastMouseYbak;
-        int mouseXbak;
-        int mouseYbak;
-        int lastscreenWidthbak;
-        int lastscreenHeightbak;
-        private void FixMouse(bool fix = true)
+        public override void Unload()
         {
-            if (fix)
-            {
-                lastMouseXbak = Main.lastMouseX;
-                lastMouseYbak = Main.lastMouseY;
-                mouseXbak = Main.mouseX;
-                mouseYbak = Main.mouseY;
-                lastscreenWidthbak = Main.screenWidth;
-                lastscreenHeightbak = Main.screenHeight;
-
-                PlayerInput.SetZoom_Unscaled();
-                PlayerInput.SetZoom_MouseInWorld();
-            }
-            else
-            {
-                Main.lastMouseX = lastMouseXbak;
-                Main.lastMouseY = lastMouseYbak;
-                Main.mouseX = mouseXbak;
-                Main.mouseY = mouseYbak;
-                Main.screenWidth = lastscreenWidthbak;
-                Main.screenHeight = lastscreenHeightbak;
-            }
+            instance = null;
+            clientConfig = null;
         }
-        */
-        #endregion
 
         private void Swap(ref Item f, ref Item s)
         {

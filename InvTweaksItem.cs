@@ -8,7 +8,7 @@ namespace InvTweaks
     {
         public override bool ConsumeItem(Item item, Player player)
         {
-            if (item.stack == 1 && Config.cursorFill)
+            if (item.stack == 1 && InvTweaks.clientConfig.CursorFill)
             {
                 for (int i = 0; i < player.inventory.Length; i++)
                 {
@@ -17,6 +17,7 @@ namespace InvTweaks
                     {
                         item.stack = queryItem.stack;
                         queryItem.TurnToAir();
+                        Recipe.FindRecipes();
                         return false;
                     }
                 }
@@ -28,7 +29,7 @@ namespace InvTweaks
         {
             if ((item.type == ItemID.ManaCrystal ||
                 item.type == ItemID.LifeCrystal ||
-                item.type == ItemID.LifeFruit) && Config.lifeCrystalDevour)
+                item.type == ItemID.LifeFruit) && InvTweaks.clientConfig.LifeCrystalDevour)
             {
                 item.useTime = 3;
                 item.useAnimation = 9;
