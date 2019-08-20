@@ -17,6 +17,7 @@ namespace InvTweaks
         public override void Load()
         {
             instance = this;
+            Main.OnTick += () => AccUtils.UpdateEquipSwap();
             if (Main.dedServ)
             {
                 Logger.Warn("DON'T LOAD INVENTORY TWEAKS ON SERVER, MAY OR MAY NOT CAUSE ISSUES");
@@ -72,18 +73,18 @@ namespace InvTweaks
                         && Main.mouseX < num + Main.inventoryBackTexture.Width * .85f
                         && Main.mouseY > 20
                         && Main.mouseY < 20 + Main.inventoryBackTexture.Width * .85f
-                        && IsAccessory(Main.mouseItem))
+                        && AccUtils.IsAccessory(Main.mouseItem))
                     {
                         Main.instance.MouseText(LMPlayer().extraSlotItem.HoverName, LMPlayer().extraSlotItem.rare);
 
                         // ItemSlot.Handle(ref LMPlayer().extraSlotItem, 0);
                         if (Main.mouseLeft && Main.mouseLeftRelease)
                         {
-                            Swap(ref Main.mouseItem, ref LMPlayer().extraSlotItem);
+                            AccUtils.SwapItem(ref Main.mouseItem, ref LMPlayer().extraSlotItem);
                         }
                         else if (Main.mouseRight && Main.mouseRightRelease)
                         {
-                            ItemSlot.SwapEquip(ref LMPlayer().extraSlotItem);
+                            AccUtils.SwapEquip(ref LMPlayer().extraSlotItem);
                         }
                     }
                     ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
@@ -104,18 +105,18 @@ namespace InvTweaks
                         && Main.mouseX < num + (int)(Main.inventoryBackTexture.Width * .75f)
                         && Main.mouseY > 20
                         && Main.mouseY < 20 + (int)(Main.inventoryBackTexture.Width * .75f)
-                        && IsAccessory(Main.mouseItem))
+                        && AccUtils.IsAccessory(Main.mouseItem))
                     {
                         Main.instance.MouseText(LMPlayer().extraSlotItem.HoverName, LMPlayer().extraSlotItem.rare);
 
                         // ItemSlot.Handle(ref LMPlayer().extraSlotItem, 0);
                         if (Main.mouseLeft && Main.mouseLeftRelease)
                         {
-                            Swap(ref Main.mouseItem, ref LMPlayer().extraSlotItem);
+                            AccUtils.SwapItem(ref Main.mouseItem, ref LMPlayer().extraSlotItem);
                         }
                         else if (Main.mouseRight && Main.mouseRightRelease)
                         {
-                            ItemSlot.SwapEquip(ref LMPlayer().extraSlotItem);
+                            AccUtils.SwapEquip(ref LMPlayer().extraSlotItem);
                         }
                     }
                     ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
@@ -130,27 +131,12 @@ namespace InvTweaks
         {
             instance = null;
             clientConfig = null;
-        }
-
-        private void Swap(ref Item f, ref Item s)
-        {
-            var temp = f;
-            f = s;
-            s = temp;
+            Main.OnTick -= () => AccUtils.UpdateEquipSwap();
         }
 
         private InvTweaksPlayer LMPlayer()
         {
             return Main.player[Main.myPlayer].GetModPlayer(this, "InvTweaksPlayer") as InvTweaksPlayer;
-        }
-
-        private bool IsAccessory(Item item)
-        {
-            return item.IsAir || (!item.IsAir && (item.vanity 
-                                || item.accessory 
-                                || item.headSlot > -1
-                                || item.bodySlot > -1 
-                                || item.legSlot > -1));
         }
         
         public static string GithubUserName { get { return "Agrair"; } }

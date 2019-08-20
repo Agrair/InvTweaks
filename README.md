@@ -8,10 +8,7 @@ Features:
  - Using Life Fruits, Life Crystals, and Mana Crystals is super fast.
  - Hold down the mouse after chopping a tree to place an acorn if you have one.
  - Buffs are automatically consumed when they run out unless you right click them.
- - The best health potion in your inventory will be consumed when you are at 30% HP, configurable.
+ - A health potion in your inventory will be consumed when you are at 30% HP, configurable.
  - All features are configurable.
 
-Changelog:
- - Support for all features + 0.11.2.2 based config
-
-Report any issues here, on the forum, or on Discord (Agrair#7746)
+Report any issues here or on the forum.

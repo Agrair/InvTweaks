@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -33,7 +32,7 @@ namespace InvTweaks
         private int originalSelectedItem;
         private bool autoRevertSelectedItem;
 
-        public void PlaceTree(Point16 mouse)
+        public void PlaceTree()
         {
             for (int i = 0; i < player.inventory.Length; i++)
             {
@@ -142,10 +141,13 @@ namespace InvTweaks
                 {
                     player.HealEffect(healLife, true);
                 }
+                bool cursorFill = InvTweaks.clientConfig.CursorFill;
+                InvTweaks.clientConfig.CursorFill = false;
                 if (ItemLoader.ConsumeItem(item, player))
                 {
                     if (--item.stack <= 0) item.TurnToAir();
                 }
+                InvTweaks.clientConfig.CursorFill = cursorFill;
                 Recipe.FindRecipes();
             }
         }
@@ -175,13 +177,11 @@ namespace InvTweaks
                 }
                 PlayerHooks.PostBuyItem(player, Main.npc[player.talkNPC], shopInventory, Main.mouseItem);
             }
-
-            //Recipe.FindRecipes();
         }
 
         public override bool CanBuyItem(NPC vendor, Item[] shopInventory, Item item)
         {
-            if (Terraria.UI.ItemSlot.ShiftInUse && !InvTweaksUI.visible)
+            if (Terraria.UI.ItemSlot.ShiftInUse)
             {
                 InvTweaksUI.visible = InvTweaks.clientConfig.ShopClick;
                 InvTweaks.instance.ui.SetStack(item.maxStack);
