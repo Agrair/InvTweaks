@@ -20,8 +20,7 @@ namespace InvTweaks
         {
             panel = new DragableUIPanel();
             panel.SetPadding(0);
-            panel.Left.Set(500, 0);
-            panel.Top.Set(258, 0);
+            panel.HAlign = panel.VAlign = .5f;
             panel.Width.Set(180, 0);
             panel.Height.Set(70, 0);
 

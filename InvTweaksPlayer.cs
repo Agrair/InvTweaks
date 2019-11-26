@@ -39,7 +39,6 @@ namespace InvTweaks
                 Item item = player.inventory[i];
                 if (item.type == ItemID.Acorn)
                 {
-                    //Main.NewText("index: " + i);
                     originalSelectedItem = player.selectedItem;
                     autoRevertSelectedItem = true;
                     player.selectedItem = i;
