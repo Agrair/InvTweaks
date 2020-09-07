@@ -12,3 +12,5 @@ Features:
  - All features are configurable.
 
 Report any issues here or on the forum.
+
+![widget](https://cdn.discordapp.com/attachments/242228770855976960/752347464505360394/widget-InvTweaks.png)
