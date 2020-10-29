@@ -4,7 +4,7 @@ using Terraria.UI;
 
 namespace InvTweaks
 {
-    internal class InvTweaksUI : UIState
+    internal class ShopStackUI : UIState
     {
         public static bool visible = false;
         private DragableUIPanel panel;

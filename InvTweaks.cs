@@ -11,7 +11,7 @@ namespace InvTweaks
         public static InvTweaks instance;
         public static ClientConfig clientConfig;
 
-        internal InvTweaksUI ui;
+        internal ShopStackUI shopStackState;
         public UserInterface uiInterface;
 
         public override void Load()
@@ -24,16 +24,14 @@ namespace InvTweaks
             }
             else
             {
-                ui = new InvTweaksUI();
-                ui.Activate();
                 uiInterface = new UserInterface();
-                uiInterface.SetState(ui);
+                uiInterface.SetState(null);
             }
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            if (InvTweaksUI.visible)
+            if (ShopStackUI.visible)
             {
                 uiInterface?.Update(gameTime);
             }
@@ -42,18 +40,15 @@ namespace InvTweaks
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int index = layers.FindIndex(x => x.Name == "Vanilla: Hotbar");
-            if (index != -1)
-            {
-                layers.Insert((index == -1) ? layers.Count - 1 : index + 1,
-                    new LegacyGameInterfaceLayer("InvTweaks: Hotbar", DrawExtraHotbarSlot,
-                    InterfaceScaleType.UI));
-            }
+            layers.Insert((index == -1) ? layers.Count - 1 : index + 1,
+                new LegacyGameInterfaceLayer("InvTweaks: Hotbar", DrawExtraHotbarSlot,
+                InterfaceScaleType.UI));
             layers.Add(new LegacyGameInterfaceLayer("InvTweaks: Shop Stack Select", delegate
             {
-                if (InvTweaksUI.visible)
+                if (ShopStackUI.visible)
                 {
                     if (Main.LocalPlayer.talkNPC == -1)
-                        InvTweaksUI.visible = false;
+                        ShopStackUI.visible = false;
                     uiInterface?.Draw(Main.spriteBatch, new GameTime());
                 }
                 return true;
@@ -135,10 +130,7 @@ namespace InvTweaks
             Main.OnTick -= () => AccUtils.UpdateEquipSwap();
         }
 
-        private InvTweaksPlayer LMPlayer()
-        {
-            return Main.player[Main.myPlayer].GetModPlayer(this, "InvTweaksPlayer") as InvTweaksPlayer;
-        }
+        private InvTweaksPlayer LMPlayer() => Main.player[Main.myPlayer].GetModPlayer(this, "InvTweaksPlayer") as InvTweaksPlayer;
 
         public static string GithubUserName { get { return "Agrair"; } }
         public static string GithubProjectName { get { return "InvTweaks"; } }

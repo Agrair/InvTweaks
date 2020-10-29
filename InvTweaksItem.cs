@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using Mono.CompilerServices.SymbolWriter;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -37,6 +38,18 @@ namespace InvTweaks
                 item.reuseDelay = 2;
                 item.useTurn = true;
             }
+        }
+
+        public override bool AltFunctionUse(Item item, Player player) => item.hammer != 0;
+
+        public override bool CanUseItem(Item item, Player player)
+        {
+            if (item.hammer != 0 && player.altFunctionUse == 2)
+            {
+
+            }
+
+            return true;
         }
     }
 }

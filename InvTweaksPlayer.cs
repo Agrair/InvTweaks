@@ -159,11 +159,11 @@ namespace InvTweaks
         public override void PostBuyItem(NPC vendor, Item[] shopInventory, Item item)
         {
             Item shopItem = shopInventory.FirstOrDefault(x => x.type == item.type);
-            if (InvTweaksUI.visible
+            if (ShopStackUI.visible
                 && !Terraria.UI.ItemSlot.ShiftInUse
                 && PlayerHooks.CanBuyItem(player, Main.npc[player.talkNPC], shopInventory, shopItem)
                 && (Main.mouseItem.stack < Main.mouseItem.maxStack)
-                && (Main.mouseItem.stack < InvTweaks.instance.ui.ShopStack)
+                && (Main.mouseItem.stack < InvTweaks.instance.shopStackState.ShopStack)
                 && player.BuyItem(shopItem.GetStoreValue(), shopItem.shopSpecialCurrency))
             {
                 Main.mouseItem.stack++;
@@ -185,10 +185,12 @@ namespace InvTweaks
 
         public override bool CanBuyItem(NPC vendor, Item[] shopInventory, Item item)
         {
-            if (Terraria.UI.ItemSlot.ShiftInUse)
+            if (InvTweaks.clientConfig.ShopClick && Terraria.UI.ItemSlot.ShiftInUse)
             {
-                InvTweaksUI.visible = InvTweaks.clientConfig.ShopClick;
-                InvTweaks.instance.ui.ShopStack = item.maxStack;
+                var state = new ShopStackUI();
+                state.Activate();
+                InvTweaks.instance.uiInterface.SetState(state);
+                InvTweaks.instance.shopStackState.ShopStack = item.maxStack;
             }
             return true;
         }
