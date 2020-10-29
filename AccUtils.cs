@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.GameContent.Achievements;
 using Terraria.ModLoader;
 using Terraria.UI;
+using Terraria.ID;
 
 namespace InvTweaks
 {
@@ -21,11 +22,19 @@ namespace InvTweaks
 
         public static bool IsAccessory(Item item)
         {
-            return item.IsAir || (!item.IsAir && (item.vanity
-                                || item.accessory
-                                || item.headSlot > -1
-                                || item.bodySlot > -1
-                                || item.legSlot > -1));
+            // Return true if the item is air so that when the slot is empty,
+            // items can be placed in it
+            if (item.IsAir)
+                return true;
+
+            if (item.vanity
+                || item.accessory
+                || item.headSlot > -1
+                || item.bodySlot > -1
+                || item.legSlot > -1)
+                return true;
+
+            return false;
         }
 
         public static void SwapItem(ref Item f, ref Item s)
@@ -70,7 +79,7 @@ namespace InvTweaks
                 int totalSlotCount = 5 + Main.player[Main.myPlayer].extraAccessorySlots;
                 for (int i = 3; i < 3 + totalSlotCount; i++)
                 {
-                    if (player.armor[i].type == 0)
+                    if (player.armor[i].type == ItemID.None)
                     {
                         accSlotCount = i - 3;
                         break;
@@ -120,7 +129,7 @@ namespace InvTweaks
             }
 
             //finish
-            Main.PlaySound(7);
+            Main.PlaySound(SoundID.Grab);
             Recipe.FindRecipes();
             success = true;
             return result;

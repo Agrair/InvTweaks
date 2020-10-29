@@ -1,11 +1,14 @@
 ﻿using InvTweaks.Gui;
 using System;
+using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace InvTweaks
 {
     internal class ShopStackUI : UIState
     {
+        public static ShopStackUI Instance => ModContent.GetInstance<InvTweaks>().shopStackState;
+
         public static bool visible = false;
         private DragableUIPanel panel;
         private NewUITextBox textBox;

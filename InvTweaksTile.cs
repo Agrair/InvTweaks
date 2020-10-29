@@ -8,7 +8,7 @@ namespace InvTweaks
     {
         public override bool Drop(int i, int j, int type)
         {
-            if (InvTweaks.clientConfig.SaplingPlacer)
+            if (ClientConfig.Instance.SaplingPlacer)
             {
                 int underneath = Main.tile[i, j + 1].type;
                 if (type == TileID.Trees
@@ -28,6 +28,23 @@ namespace InvTweaks
                 }
             }
             return true;
+        }
+
+        public override void RightClick(int i, int j, int type)
+        {
+            Main.NewText("HI");
+            var player = Main.LocalPlayer;
+            var item = player.HeldItem;
+            if (item.hammer != 0)
+            {
+/*                SlopeHammerUI.visible = true;
+                var state = new SlopeHammerUI();
+                state.Activate();
+                state.Tile = (i, j);
+                InvTweaks.instance.uiInterface.SetState(state);*/
+
+                Main.NewText(Main.tile[i, j].slope());
+            }
         }
     }
 }

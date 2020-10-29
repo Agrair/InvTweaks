@@ -1,5 +1,4 @@
-﻿using Mono.CompilerServices.SymbolWriter;
-using Terraria;
+﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -9,7 +8,7 @@ namespace InvTweaks
     {
         public override bool ConsumeItem(Item item, Player player)
         {
-            if (item.stack == 1 && InvTweaks.clientConfig.CursorFill)
+            if (item.stack == 1 && ClientConfig.Instance.CursorFill)
             {
                 for (int i = 0; i < player.inventory.Length; i++)
                 {
@@ -30,7 +29,7 @@ namespace InvTweaks
         {
             if ((item.type == ItemID.ManaCrystal ||
                 item.type == ItemID.LifeCrystal ||
-                item.type == ItemID.LifeFruit) && InvTweaks.clientConfig.LifeCrystalDevour)
+                item.type == ItemID.LifeFruit) && ClientConfig.Instance.LifeCrystalDevour)
             {
                 item.useTime = 3;
                 item.useAnimation = 9;
@@ -38,18 +37,6 @@ namespace InvTweaks
                 item.reuseDelay = 2;
                 item.useTurn = true;
             }
-        }
-
-        public override bool AltFunctionUse(Item item, Player player) => item.hammer != 0;
-
-        public override bool CanUseItem(Item item, Player player)
-        {
-            if (item.hammer != 0 && player.altFunctionUse == 2)
-            {
-
-            }
-
-            return true;
         }
     }
 }

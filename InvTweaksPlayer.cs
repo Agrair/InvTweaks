@@ -60,7 +60,7 @@ namespace InvTweaks
 
         public override void PostUpdateBuffs()
         {
-            if (InvTweaks.clientConfig.AutoBuff)
+            if (ClientConfig.Instance.AutoBuff)
             {
                 for (int queryBuff = 0; queryBuff < player.buffTime.Length; queryBuff++)
                 {
@@ -74,14 +74,14 @@ namespace InvTweaks
                                 player.buffTime[queryBuff] = player.inventory[queryItem].buffTime;
                                 //the swapping of cursorFill is unconventional,
                                 //but prevents items from randomly teleporting thru the inv
-                                bool cursorFill = InvTweaks.clientConfig.CursorFill;
-                                InvTweaks.clientConfig.CursorFill = false;
+                                bool cursorFill = ClientConfig.Instance.CursorFill;
+                                ClientConfig.Instance.CursorFill = false;
                                 if (ItemLoader.ConsumeItem(player.inventory[queryItem], player))
                                 {
                                     if (--player.inventory[queryItem].stack <= 0)
                                         player.inventory[queryItem].TurnToAir();
                                 }
-                                InvTweaks.clientConfig.CursorFill = cursorFill;
+                                ClientConfig.Instance.CursorFill = cursorFill;
                                 Recipe.FindRecipes();
                             }
                         }
@@ -104,8 +104,8 @@ namespace InvTweaks
 
         public override void PostHurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit)
         {
-            if (InvTweaks.clientConfig.AutoHeal
-                && player.statLife < player.statLifeMax2 * (InvTweaks.clientConfig.AutoHealThreshold * .01))
+            if (ClientConfig.Instance.AutoHeal
+                && player.statLife < player.statLifeMax2 * (ClientConfig.Instance.AutoHealThreshold * .01))
             {
                 if (player.noItems)
                     return;
@@ -144,14 +144,14 @@ namespace InvTweaks
                 {
                     player.HealEffect(healLife, true);
                 }
-                bool cursorFill = InvTweaks.clientConfig.CursorFill;
-                InvTweaks.clientConfig.CursorFill = false;
+                bool cursorFill = ClientConfig.Instance.CursorFill;
+                ClientConfig.Instance.CursorFill = false;
                 if (ItemLoader.ConsumeItem(item, player))
                 {
                     if (--item.stack <= 0)
                         item.TurnToAir();
                 }
-                InvTweaks.clientConfig.CursorFill = cursorFill;
+                ClientConfig.Instance.CursorFill = cursorFill;
                 Recipe.FindRecipes();
             }
         }
@@ -163,7 +163,7 @@ namespace InvTweaks
                 && !Terraria.UI.ItemSlot.ShiftInUse
                 && PlayerHooks.CanBuyItem(player, Main.npc[player.talkNPC], shopInventory, shopItem)
                 && (Main.mouseItem.stack < Main.mouseItem.maxStack)
-                && (Main.mouseItem.stack < InvTweaks.instance.shopStackState.ShopStack)
+                && (Main.mouseItem.stack < ShopStackUI.Instance.ShopStack)
                 && player.BuyItem(shopItem.GetStoreValue(), shopItem.shopSpecialCurrency))
             {
                 Main.mouseItem.stack++;
@@ -185,12 +185,13 @@ namespace InvTweaks
 
         public override bool CanBuyItem(NPC vendor, Item[] shopInventory, Item item)
         {
-            if (InvTweaks.clientConfig.ShopClick && Terraria.UI.ItemSlot.ShiftInUse)
+            if (ClientConfig.Instance.ShopClick && Terraria.UI.ItemSlot.ShiftInUse)
             {
+                var mod = ModContent.GetInstance<InvTweaks>();
                 var state = new ShopStackUI();
                 state.Activate();
-                InvTweaks.instance.uiInterface.SetState(state);
-                InvTweaks.instance.shopStackState.ShopStack = item.maxStack;
+                state.ShopStack = item.maxStack;
+                mod.userInterface.SetState(mod.shopStackState = state);
             }
             return true;
         }

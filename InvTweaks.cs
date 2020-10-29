@@ -8,15 +8,12 @@ namespace InvTweaks
 {
     public class InvTweaks : Mod
     {
-        public static InvTweaks instance;
-        public static ClientConfig clientConfig;
-
+        //internal SlopeHammerUI slopeHammerState;
         internal ShopStackUI shopStackState;
-        public UserInterface uiInterface;
+        public UserInterface userInterface;
 
         public override void Load()
         {
-            instance = this;
             Main.OnTick += () => AccUtils.UpdateEquipSwap();
             if (Main.dedServ)
             {
@@ -24,16 +21,18 @@ namespace InvTweaks
             }
             else
             {
-                uiInterface = new UserInterface();
-                uiInterface.SetState(null);
+                userInterface = new UserInterface();
+                userInterface.SetState(null);
             }
         }
 
+        private GameTime time;
         public override void UpdateUI(GameTime gameTime)
         {
-            if (ShopStackUI.visible)
+            time = gameTime;
+            if (ShopStackUI.visible/* || SlopeHammerUI.visible*/)
             {
-                uiInterface?.Update(gameTime);
+                userInterface?.Update(gameTime);
             }
         }
 
@@ -48,25 +47,42 @@ namespace InvTweaks
                 if (ShopStackUI.visible)
                 {
                     if (Main.LocalPlayer.talkNPC == -1)
+                    {
                         ShopStackUI.visible = false;
-                    uiInterface?.Draw(Main.spriteBatch, new GameTime());
+                        userInterface.SetState(shopStackState = null);
+                    }
+                    userInterface?.Draw(Main.spriteBatch, time);
                 }
                 return true;
             }, InterfaceScaleType.UI));
+/*            layers.Add(new LegacyGameInterfaceLayer("InvTweaks: Slope Hammer Wheel", delegate
+            {
+                if (SlopeHammerUI.visible)
+                {
+                    if (Main.mouseRightRelease)
+                    {
+                        SlopeHammerUI.visible = false;
+                        (userInterface.CurrentState as SlopeHammerUI).Apply();
+                        userInterface.SetState(slopeHammerState = null);
+                    }
+                    userInterface?.Draw(Main.spriteBatch, time);
+                }
+                return true;
+            }, InterfaceScaleType.UI));*/
         }
 
         private bool DrawExtraHotbarSlot()
         {
-            if (!Main.gameMenu && clientConfig.HelmetSlot)
+            if (!Main.gameMenu && ClientConfig.Instance.HelmetSlot)
             {
                 float oldScale = Main.inventoryScale;
                 Main.inventoryScale = .75f;
                 if (Main.playerInventory)
                 {
                     Main.inventoryScale = .85f;
-                    int num = 20 + ((int)(Main.inventoryBackTexture.Width * .85f) + 4) * 10;
-                    if (Main.mouseX > num
-                        && Main.mouseX < num + Main.inventoryBackTexture.Width * .85f
+                    int x = 20 + ((int)(Main.inventoryBackTexture.Width * .85f) + 4) * 10;
+                    if (Main.mouseX > x
+                        && Main.mouseX < x + Main.inventoryBackTexture.Width * .85f
                         && Main.mouseY > 20
                         && Main.mouseY < 20 + Main.inventoryBackTexture.Width * .85f
                         && AccUtils.IsAccessory(Main.mouseItem))
@@ -84,21 +100,21 @@ namespace InvTweaks
                         }
                     }
                     ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
-                        ItemSlot.Context.EquipAccessory, new Vector2(num, 20));
+                        ItemSlot.Context.EquipAccessory, new Vector2(x, 20));
                 }
                 else
                 {
-                    int num = 20;
+                    int x = 20;
                     for (int i = 0; i < Main.hotbarScale.Length; i++)
                     {
-                        num += (int)(Main.inventoryBackTexture.Width * Main.hotbarScale[i]) + 4;
+                        x += (int)(Main.inventoryBackTexture.Width * Main.hotbarScale[i]) + 4;
                     }
                     if (Main.LocalPlayer.selectedItem >= Main.hotbarScale.Length)
                     {
-                        num += Main.inventoryBackTexture.Width + 4;
+                        x += Main.inventoryBackTexture.Width + 4;
                     }
-                    if (Main.mouseX > num
-                        && Main.mouseX < num + (int)(Main.inventoryBackTexture.Width * .75f)
+                    if (Main.mouseX > x
+                        && Main.mouseX < x + (int)(Main.inventoryBackTexture.Width * .75f)
                         && Main.mouseY > 20
                         && Main.mouseY < 20 + (int)(Main.inventoryBackTexture.Width * .75f)
                         && AccUtils.IsAccessory(Main.mouseItem))
@@ -116,7 +132,7 @@ namespace InvTweaks
                         }
                     }
                     ItemSlot.Draw(Main.spriteBatch, ref LMPlayer().extraSlotItem,
-                        ItemSlot.Context.EquipAccessory, new Vector2(num, 25));
+                        ItemSlot.Context.EquipAccessory, new Vector2(x, 25));
                 }
                 Main.inventoryScale = oldScale;
             }
@@ -125,8 +141,6 @@ namespace InvTweaks
 
         public override void Unload()
         {
-            instance = null;
-            clientConfig = null;
             Main.OnTick -= () => AccUtils.UpdateEquipSwap();
         }
 

@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel;
+using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 
 namespace InvTweaks
 {
     public class ClientConfig : ModConfig
     {
+        public static ClientConfig Instance => ModContent.GetInstance<ClientConfig>();
+
         [DefaultValue(true)]
         [Label("Cursor Refill")]
         [Tooltip("You don't need to worry about running out torches in your hand as long as there's more in your inventory.")]
@@ -47,10 +50,5 @@ namespace InvTweaks
         public float AutoHealThreshold { get; set; }
 
         public override ConfigScope Mode => ConfigScope.ClientSide;
-
-        public override void OnLoaded()
-        {
-            InvTweaks.clientConfig = this;
-        }
     }
 }
