@@ -48,7 +48,7 @@ namespace InvTweaks
             int vanityOffset = (item.vanity && !item.accessory) ? 10 : 0;
             item.favorited = false;
             Item result = item;
-            
+
             //decide where the item should go
             if (item.headSlot != -1)
             {
@@ -78,8 +78,10 @@ namespace InvTweaks
                 }
                 for (int j = 0; j < player.armor.Length; j++)
                 {
-                    if (item.IsTheSameAs(player.armor[j])) accSlotCount = j - 3;
-                    if (j < 10 && item.wingSlot > 0 && player.armor[j].wingSlot > 0) accSlotCount = j - 3;
+                    if (item.IsTheSameAs(player.armor[j]))
+                        accSlotCount = j - 3;
+                    if (j < 10 && item.wingSlot > 0 && player.armor[j].wingSlot > 0)
+                        accSlotCount = j - 3;
                 }
                 for (int k = 0; k < totalSlotCount; k++)
                 {
@@ -108,11 +110,13 @@ namespace InvTweaks
                 }
 
                 //finish accessory swap
-                if (!ItemLoader.CanEquipAccessory(item, num3)) return item;
+                if (!ItemLoader.CanEquipAccessory(item, num3))
+                    return item;
                 result = player.armor[num3].Clone();
                 player.armor[num3] = item.Clone();
                 slotCountInfo.SetValue(null, ++accSlotCount);
-                if (accSlotCount >= totalSlotCount) slotCountInfo.SetValue(null, 0);
+                if (accSlotCount >= totalSlotCount)
+                    slotCountInfo.SetValue(null, 0);
             }
 
             //finish

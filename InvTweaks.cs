@@ -52,7 +52,8 @@ namespace InvTweaks
             {
                 if (InvTweaksUI.visible)
                 {
-                    if (Main.LocalPlayer.talkNPC == -1) InvTweaksUI.visible = false;
+                    if (Main.LocalPlayer.talkNPC == -1)
+                        InvTweaksUI.visible = false;
                     uiInterface?.Draw(Main.spriteBatch, new GameTime());
                 }
                 return true;
@@ -138,7 +139,7 @@ namespace InvTweaks
         {
             return Main.player[Main.myPlayer].GetModPlayer(this, "InvTweaksPlayer") as InvTweaksPlayer;
         }
-        
+
         public static string GithubUserName { get { return "Agrair"; } }
         public static string GithubProjectName { get { return "InvTweaks"; } }
     }

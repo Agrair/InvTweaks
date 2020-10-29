@@ -21,7 +21,8 @@ namespace InvTweaks
         {
             // legacy load
             int type = tag.GetInt("extraSlotItem_Type");
-            if (type != 0) extraSlotItem.SetDefaults(type);
+            if (type != 0)
+                extraSlotItem.SetDefaults(type);
             if (tag.GetCompound("extraSlotItem") is TagCompound item
                 && item != new TagCompound())
             {
@@ -106,15 +107,18 @@ namespace InvTweaks
             if (InvTweaks.clientConfig.AutoHeal
                 && player.statLife < player.statLifeMax2 * (InvTweaks.clientConfig.AutoHealThreshold * .01))
             {
-                if (player.noItems) return;
-                if (player.potionDelay > 0) return;
-                if (!(player.QuickHeal_GetItemToUse() is Item item)) return;
+                if (player.noItems)
+                    return;
+                if (player.potionDelay > 0)
+                    return;
+                if (!(player.QuickHeal_GetItemToUse() is Item item))
+                    return;
 
                 Main.PlaySound(item.UseSound, player.position);
 
                 if (item.potion)
                 {
-                    if (item.type == 227)
+                    if (item.type == ItemID.RestorationPotion)
                     {
                         player.AddBuff(21, player.potionDelay = player.restorationDelayTime, true);
                     }
@@ -144,7 +148,8 @@ namespace InvTweaks
                 InvTweaks.clientConfig.CursorFill = false;
                 if (ItemLoader.ConsumeItem(item, player))
                 {
-                    if (--item.stack <= 0) item.TurnToAir();
+                    if (--item.stack <= 0)
+                        item.TurnToAir();
                 }
                 InvTweaks.clientConfig.CursorFill = cursorFill;
                 Recipe.FindRecipes();
@@ -158,7 +163,7 @@ namespace InvTweaks
                 && !Terraria.UI.ItemSlot.ShiftInUse
                 && PlayerHooks.CanBuyItem(player, Main.npc[player.talkNPC], shopInventory, shopItem)
                 && (Main.mouseItem.stack < Main.mouseItem.maxStack)
-                && (Main.mouseItem.stack < InvTweaks.instance.ui.GetStack())
+                && (Main.mouseItem.stack < InvTweaks.instance.ui.ShopStack)
                 && player.BuyItem(shopItem.GetStoreValue(), shopItem.shopSpecialCurrency))
             {
                 Main.mouseItem.stack++;
@@ -174,7 +179,7 @@ namespace InvTweaks
                 {
                     shopItem.SetDefaults(0, false);
                 }
-                PlayerHooks.PostBuyItem(player, Main.npc[player.talkNPC], shopInventory, Main.mouseItem);
+                //PlayerHooks.PostBuyItem(player, Main.npc[player.talkNPC], shopInventory, Main.mouseItem);
             }
         }
 
@@ -183,7 +188,7 @@ namespace InvTweaks
             if (Terraria.UI.ItemSlot.ShiftInUse)
             {
                 InvTweaksUI.visible = InvTweaks.clientConfig.ShopClick;
-                InvTweaks.instance.ui.SetStack(item.maxStack);
+                InvTweaks.instance.ui.ShopStack = item.maxStack;
             }
             return true;
         }
