@@ -29,22 +29,5 @@ namespace InvTweaks
             }
             return true;
         }
-
-        public override void RightClick(int i, int j, int type)
-        {
-            Main.NewText("HI");
-            var player = Main.LocalPlayer;
-            var item = player.HeldItem;
-            if (item.hammer != 0)
-            {
-/*                SlopeHammerUI.visible = true;
-                var state = new SlopeHammerUI();
-                state.Activate();
-                state.Tile = (i, j);
-                InvTweaks.instance.uiInterface.SetState(state);*/
-
-                Main.NewText(Main.tile[i, j].slope());
-            }
-        }
     }
 }
