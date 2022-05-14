@@ -10,7 +10,7 @@ namespace InvTweaks
         {
             if (ClientConfig.Instance.SaplingPlacer)
             {
-                int underneath = Main.tile[i, j + 1].type;
+                int underneath = Main.tile[i, j + 1].TileType;
                 if (type == TileID.Trees
                     && (TileID.Sets.Conversion.Grass[underneath]
                     || underneath == TileID.Sand

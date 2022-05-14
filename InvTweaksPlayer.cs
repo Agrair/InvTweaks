@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -17,7 +18,7 @@ namespace InvTweaks
             extraSlotItem.TurnToAir();
         }
 
-        public override void Load(TagCompound tag)
+        public override void LoadData(TagCompound tag)
         {
             // legacy load
             int type = tag.GetInt("extraSlotItem_Type");
@@ -35,51 +36,48 @@ namespace InvTweaks
 
         public void PlaceTree()
         {
-            for (int i = 0; i < player.inventory.Length; i++)
+            for (int i = 0; i < Player.inventory.Length; i++)
             {
-                Item item = player.inventory[i];
+                Item item = Player.inventory[i];
                 if (item.type == ItemID.Acorn)
                 {
-                    originalSelectedItem = player.selectedItem;
+                    originalSelectedItem = Player.selectedItem;
                     autoRevertSelectedItem = true;
-                    player.selectedItem = i;
-                    player.controlUseItem = true;
-                    player.ItemCheck(Main.myPlayer);
+                    Player.selectedItem = i;
+                    Player.controlUseItem = true;
+                    Player.ItemCheck(Main.myPlayer);
                     return;
                 }
             }
         }
 
-        public override TagCompound Save()
+        public override void SaveData(TagCompound tag)
         {
-            return new TagCompound
-            {
-                ["extraSlotItem"] = ItemIO.Save(extraSlotItem)
-            };
+            tag.Add("extraSlotItem", ItemIO.Save(extraSlotItem));
         }
 
         public override void PostUpdateBuffs()
         {
             if (ClientConfig.Instance.AutoBuff)
             {
-                for (int queryBuff = 0; queryBuff < player.buffTime.Length; queryBuff++)
+                for (int queryBuff = 0; queryBuff < Player.buffTime.Length; queryBuff++)
                 {
-                    if (player.buffTime[queryBuff] == 1)
+                    if (Player.buffTime[queryBuff] == 1)
                     {
-                        for (int queryItem = 0; queryItem < player.inventory.Length - 5; queryItem++)
+                        for (int queryItem = 0; queryItem < Player.inventory.Length - 5; queryItem++)
                         {
-                            if (player.inventory[queryItem].buffType == player.buffType[queryBuff])
+                            if (Player.inventory[queryItem].buffType == Player.buffType[queryBuff])
                             {
-                                ItemLoader.UseItem(player.inventory[queryItem], player);
-                                player.buffTime[queryBuff] = player.inventory[queryItem].buffTime;
+                                ItemLoader.UseItem(Player.inventory[queryItem], Player);
+                                Player.buffTime[queryBuff] = Player.inventory[queryItem].buffTime;
                                 //the swapping of cursorFill is unconventional,
                                 //but prevents items from randomly teleporting thru the inv
                                 bool cursorFill = ClientConfig.Instance.CursorFill;
                                 ClientConfig.Instance.CursorFill = false;
-                                if (ItemLoader.ConsumeItem(player.inventory[queryItem], player))
+                                if (ItemLoader.ConsumeItem(Player.inventory[queryItem], Player))
                                 {
-                                    if (--player.inventory[queryItem].stack <= 0)
-                                        player.inventory[queryItem].TurnToAir();
+                                    if (--Player.inventory[queryItem].stack <= 0)
+                                        Player.inventory[queryItem].TurnToAir();
                                 }
                                 ClientConfig.Instance.CursorFill = cursorFill;
                                 Recipe.FindRecipes();
@@ -94,9 +92,9 @@ namespace InvTweaks
         {
             if (autoRevertSelectedItem)
             {
-                if (player.itemTime == 0 && player.itemAnimation == 0)
+                if (Player.itemTime == 0 && Player.itemAnimation == 0)
                 {
-                    player.selectedItem = originalSelectedItem;
+                    Player.selectedItem = originalSelectedItem;
                     autoRevertSelectedItem = false;
                 }
             }
@@ -105,48 +103,48 @@ namespace InvTweaks
         public override void PostHurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit)
         {
             if (ClientConfig.Instance.AutoHeal
-                && player.statLife < player.statLifeMax2 * (ClientConfig.Instance.AutoHealThreshold * .01))
+                && Player.statLife < Player.statLifeMax2 * (ClientConfig.Instance.AutoHealThreshold * .01))
             {
-                if (player.noItems)
+                if (Player.noItems)
                     return;
-                if (player.potionDelay > 0)
+                if (Player.potionDelay > 0)
                     return;
-                if (!(player.QuickHeal_GetItemToUse() is Item item))
+                if (!(Player.QuickHeal_GetItemToUse() is Item item))
                     return;
 
-                Main.PlaySound(item.UseSound, player.position);
+                SoundEngine.PlaySound(item.UseSound, Player.position);
 
                 if (item.potion)
                 {
                     if (item.type == ItemID.RestorationPotion)
                     {
-                        player.AddBuff(21, player.potionDelay = player.restorationDelayTime, true);
+                        Player.AddBuff(21, Player.potionDelay = Player.restorationDelayTime, true);
                     }
                     else
                     {
-                        player.AddBuff(21, player.potionDelay = player.potionDelayTime, true);
+                        Player.AddBuff(21, Player.potionDelay = Player.potionDelayTime, true);
                     }
                 }
-                ItemLoader.UseItem(item, player);
-                int healLife = player.GetHealLife(item, true);
+                ItemLoader.UseItem(item, Player);
+                int healLife = Player.GetHealLife(item, true);
 
-                player.statLife += healLife;
+                Player.statLife += healLife;
 
-                if (player.statLife > player.statLifeMax2)
+                if (Player.statLife > Player.statLifeMax2)
                 {
-                    player.statLife = player.statLifeMax2;
+                    Player.statLife = Player.statLifeMax2;
                 }
-                if (player.statMana > player.statManaMax2)
+                if (Player.statMana > Player.statManaMax2)
                 {
-                    player.statMana = player.statManaMax2;
+                    Player.statMana = Player.statManaMax2;
                 }
-                if (healLife > 0 && Main.myPlayer == player.whoAmI)
+                if (healLife > 0 && Main.myPlayer == Player.whoAmI)
                 {
-                    player.HealEffect(healLife, true);
+                    Player.HealEffect(healLife, true);
                 }
                 bool cursorFill = ClientConfig.Instance.CursorFill;
                 ClientConfig.Instance.CursorFill = false;
-                if (ItemLoader.ConsumeItem(item, player))
+                if (ItemLoader.ConsumeItem(item, Player))
                 {
                     if (--item.stack <= 0)
                         item.TurnToAir();
@@ -161,10 +159,10 @@ namespace InvTweaks
             Item shopItem = shopInventory.FirstOrDefault(x => x.type == item.type);
             if (ShopStackUI.visible
                 && !Terraria.UI.ItemSlot.ShiftInUse
-                && PlayerHooks.CanBuyItem(player, Main.npc[player.talkNPC], shopInventory, shopItem)
+                && PlayerLoader.CanBuyItem(Player, Main.npc[Player.talkNPC], shopInventory, shopItem)
                 && (Main.mouseItem.stack < Main.mouseItem.maxStack)
-                && (Main.mouseItem.stack < ShopStackUI.Instance.ShopStack)
-                && player.BuyItem(shopItem.GetStoreValue(), shopItem.shopSpecialCurrency))
+                && (Main.mouseItem.stack < InvTweaksGuiSystem.Instance.shopStackState.ShopStack)
+                && Player.BuyItem(shopItem.GetStoreValue(), shopItem.shopSpecialCurrency))
             {
                 Main.mouseItem.stack++;
                 if (Main.stackSplit == 0)
@@ -179,7 +177,7 @@ namespace InvTweaks
                 {
                     shopItem.SetDefaults(0, false);
                 }
-                //PlayerHooks.PostBuyItem(player, Main.npc[player.talkNPC], shopInventory, Main.mouseItem);
+                PlayerLoader.PostBuyItem(Player, Main.npc[Player.talkNPC], shopInventory, Main.mouseItem);
             }
         }
 
@@ -187,11 +185,12 @@ namespace InvTweaks
         {
             if (ClientConfig.Instance.ShopClick && Terraria.UI.ItemSlot.ShiftInUse)
             {
-                var mod = ModContent.GetInstance<InvTweaks>();
+                var gui = InvTweaksGuiSystem.Instance;
                 var state = new ShopStackUI();
                 state.Activate();
                 state.ShopStack = item.maxStack;
-                mod.userInterface.SetState(mod.shopStackState = state);
+                ShopStackUI.visible = true;
+                gui.userInterface.SetState(gui.shopStackState = state);
             }
             return true;
         }
