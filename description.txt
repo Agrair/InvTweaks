@@ -1,4 +1,4 @@
-[i:29] Inventory Tweaks is a mod inspired by the Minecraft mod Inventory Tweaks. Everything is client-side, which means you can play it on a server that doesn't have it.
+[i:29] Inventory Tweaks is a Terraria mod that adds some quality of life changes to the way the inventory works. 
 
 [i:109] Features:
  [i:97] When you consume an item, and the same kind of item is in your inventory, it'll automatically go into your hand after use.
