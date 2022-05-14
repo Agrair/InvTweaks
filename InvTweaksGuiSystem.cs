@@ -51,6 +51,8 @@ namespace InvTweaks {
                         && Main.mouseY > y
                         && Main.mouseY < y + TextureAssets.InventoryBack.Value.Width * .85f) {
 
+                        player.mouseInterface = true;
+
                         ItemSlot.OverrideHover(ref modPlayer.extraSlotItem);
                         // Checks both the slot item % mouseItem
                         if (isAccessory(modPlayer.extraSlotItem)) {
@@ -81,6 +83,8 @@ namespace InvTweaks {
                         && Main.mouseX < x + TextureAssets.InventoryBack.Value.Width * .85f
                         && Main.mouseY > y
                         && Main.mouseY < y + TextureAssets.InventoryBack.Value.Width * .85f) {
+
+                        player.mouseInterface = true;
 
                         ItemSlot.OverrideHover(ref modPlayer.extraSlotItem, ItemSlot.Context.HotbarItem);
                         ItemSlot.RightClick(ref modPlayer.extraSlotItem);
